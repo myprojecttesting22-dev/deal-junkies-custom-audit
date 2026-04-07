@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Junkies — Content Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --off: #FDFCF0;
+    --ink: #111111;
+    --muted: #888888;
+    --rule: #e8e5de;
+    --gold: #b8956a;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 20px 100px;
+  }
+
+  .doc {
+    background: var(--white);
+    width: 100%;
+    max-width: 780px;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04), 0 12px 48px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .doc-head {
+    padding: 52px 56px 40px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .eyebrow::before {
+    content: '★';
+    font-size: 12px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  .doc-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── TOC LABEL ── */
+  .toc-label {
+    padding: 28px 56px 0;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* ── ACCORDION ── */
+  .accordion {
+    padding: 16px 40px 48px;
+  }
+
+  .item {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .item:last-child { border-bottom: none; }
+
+  .trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    border-radius: 8px;
+  }
+
+  .trigger:hover { background: var(--off); }
+
+  /* ── NUMBER BADGE — strictly black ── */
+  .num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: #000000;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+  }
+
+  .trigger-text {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: var(--muted);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .item.open .chevron { transform: rotate(180deg); }
+
+  /* ── PANEL ── */
+  .panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .panel-inner {
+    padding: 4px 16px 28px 16px;
+  }
+
+  /* ════════════════════════════════════════
+     NOTEBOOK PAGE — single white container
+     that holds all subpoints for a section
+  ════════════════════════════════════════ */
+  .page {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e4e0d8;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+    padding: 24px;
+  }
+
+  /* ── SUBPOINT ROW (flex) ── */
+  .subpoint {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  .subpoint:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  /* ── LETTER BADGE — strictly black ── */
+  .sub-letter {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: #000000;
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px; /* optical alignment with cap-height of first text line */
+  }
+
+  /* ── SUBPOINT TEXT BLOCK ── */
+  .subpoint-content {
+    flex: 1;
+  }
+
+  .subpoint-content p {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #333333;
+  }
+
+  /* ── REALIZE CALLOUT ── */
+  .realize {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0ede7;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .realize strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ── CREATE MEDIA BADGE ── */
+  .cm-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  /* Text following the cm-tag gets a warm tint */
+  .cm-tag + p {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #5a4a2a;
+  }
+
+  /* ══════════════════════════════════════
+     SECTION 6 — Case Study below the page
+  ══════════════════════════════════════ */
+  .case-col {
+    margin-top: 20px;
+  }
+
+  .case-caption {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  /* 3-column image grid */
+  .case-imgs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .case-imgs img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    display: block;
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <div class="doc-head">
+    <div class="eyebrow">Prepared by Create Media</div>
+    <h1>Deal Junkies<br>Content Audit</h1>
+    <p class="doc-desc">Seven high-leverage growth opportunities — click any section to expand.</p>
+  </div>
+
+  <div class="toc-label">Table of Contents</div>
+
+  <div class="accordion">
+
+    <!-- ── 1: Guest Sourcing & Distribution ── -->
+    <div class="item" id="item-1">
+      <button class="trigger" onclick="toggle(1)" aria-expanded="false">
+        <span class="num">1</span>
+        <span class="trigger-text">Guest Sourcing &amp; Distribution</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel" id="panel-1">
+        <div class="panel-inner">
+          <div class="page">
+
+            <div class="subpoint">
+              <span class="sub-letter">A</span>
+              <div class="subpoint-content">
+                <p>Deal Junkies can benefit from strategically booking high-level real estate operators who already have an established digital footprint.</p>
+                <div class="realize"><strong>To realize this effect:</strong> We implement a done-for-you outreach system. You don't have to worry about sourcing or sending emails — you just show up to the studio to record, and we handle the entire booking pipeline.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">B</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from guests sharing or mentioning the channel when their episodes go live, helping boost distribution and driving their audience to your channel.</p>
+                <div class="realize"><strong>To realize this effect:</strong> Provide guests with pre-written captions and shareable assets, making it easy for them to promote their episode across their social channels.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">C</span>
+              <div class="subpoint-content">
+                <div class="cm-tag">Create Media</div>
+                <p>Creates custom asset folders that make it simple for guests to post on social media. This includes 3 highly edited viral shorts, graphics, and social media copy that guests can post seamlessly within 48 hours of the drop.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2: Podcast Retention Editing ── -->
+    <div class="item" id="item-2">
+      <button class="trigger" onclick="toggle(2)" aria-expanded="false">
+        <span class="num">2</span>
+        <span class="trigger-text">Podcast Retention Editing</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel" id="panel-2">
+        <div class="panel-inner">
+          <div class="page">
+
+            <div class="subpoint">
+              <span class="sub-letter">A</span>
+              <div class="subpoint-content">
+                <p>Deal Junkies can benefit from implementing visual retention editing, rather than uploading static, single-angle videos or audio-only files, which causes viewers to drop off early.</p>
+                <div class="realize"><strong>To realize this effect:</strong> Utilize dynamic camera switching, insert a cinematic hook at the beginning of the episode, and remove dead air to maintain high viewer engagement throughout the hour.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">B</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from visual pacing during complex real estate discussions, making it easier for the audience to digest high-level syndication and multifamily concepts.</p>
+                <div class="realize"><strong>To realize this effect:</strong> Add relevant b-roll, screen recordings of deal breakdowns, and subtle text animations when a guest drops a specific framework or number.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">C</span>
+              <div class="subpoint-content">
+                <div class="cm-tag">Create Media</div>
+                <p>Handles end-to-end podcast editing — audio engineering to balance the mics, color grading to fix studio lighting, and full retention editing so the final product looks and sounds like a top 1% show.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3: Studio & Production Optimization ── -->
+    <div class="item" id="item-3">
+      <button class="trigger" onclick="toggle(3)" aria-expanded="false">
+        <span class="num">3</span>
+        <span class="trigger-text">Studio &amp; Production Optimization</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel" id="panel-3">
+        <div class="panel-inner">
+          <div class="page">
+
+            <div class="subpoint">
+              <span class="sub-letter">A</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from transitioning away from a single, static wide-angle shot — where hosts are sometimes visually blocked by microphones or hats — to a dynamic multi-camera setup.</p>
+                <div class="realize"><strong>To realize this effect:</strong> Implement dedicated camera angles for the guest and the hosts, allowing for dynamic visual punch-ins that capture facial expressions, reactions, and active listening.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">B</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from optimized studio lighting to separate the speakers from the dark background and instantly elevate the perceived production value of the show.</p>
+                <div class="realize"><strong>To realize this effect:</strong> Introduce a standardized lighting framework (key, fill, and edge lighting) to eliminate flat visuals and create a premium, cinematic depth in the room.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">C</span>
+              <div class="subpoint-content">
+                <div class="cm-tag">Create Media</div>
+                <p>Provides comprehensive studio optimization consulting — custom gear recommendations, precise camera placement maps, and lighting diagrams tailored to your exact room, ensuring the raw footage looks like a top 1% show before editing even begins.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4: Title & Thumbnail Optimization ── -->
+    <div class="item" id="item-4">
+      <button class="trigger" onclick="toggle(4)" aria-expanded="false">
+        <span class="num">4</span>
+        <span class="trigger-text">Title &amp; Thumbnail Optimization</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel" id="panel-4">
+        <div class="panel-inner">
+          <div class="page">
+
+            <div class="subpoint">
+              <span class="sub-letter">A</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from abandoning the current "blind posting" strategy — where episodes are uploaded with identical, static logo graphics — and shifting to visually hook-driven thumbnails.</p>
+                <div class="realize"><strong>To realize this effect:</strong> We design custom thumbnails featuring high-contrast faces of guests and hosts, paired with concise, curiosity-inducing text (e.g., "The Dark Side of Syndication") rather than repeating the episode title.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">B</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from optimized title structures that cater directly to YouTube search intent and click-through-rate (CTR) psychology, rather than simply listing the guest's name and episode number.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5: Channel Renovation & Branding ── -->
+    <div class="item" id="item-5">
+      <button class="trigger" onclick="toggle(5)" aria-expanded="false">
+        <span class="num">5</span>
+        <span class="trigger-text">Channel Renovation &amp; Branding</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel" id="panel-5">
+        <div class="panel-inner">
+          <div class="page">
+
+            <div class="subpoint">
+              <span class="sub-letter">A</span>
+              <div class="subpoint-content">
+                <p>Deal Junkies can benefit from a complete visual overhaul and the elimination of audio-only uploads, which currently confuse the YouTube algorithm and dilute your channel's authority.</p>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">B</span>
+              <div class="subpoint-content">
+                <div class="cm-tag">Create Media</div>
+                <p>Designs a premium, unified visual identity (custom banners and cohesive logos) and strictly optimizes the channel for video-first content, positioning your brand as a top-tier media entity rather than just a visual RSS feed.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6: Viral Short-Form & Theme Page Distribution ── -->
+    <div class="item" id="item-6">
+      <button class="trigger" onclick="toggle(6)" aria-expanded="false">
+        <span class="num">6</span>
+        <span class="trigger-text">Viral Short-Form &amp; Theme Page Distribution</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel" id="panel-6">
+        <div class="panel-inner">
+
+          <!-- Subpoints: full width, no split -->
+          <div class="page">
+
+            <div class="subpoint">
+              <span class="sub-letter">A</span>
+              <div class="subpoint-content">
+                <p>Deal Junkies can benefit from distributing short-form clips through established real estate theme pages, putting your content directly in front of the top 1% of the industry.</p>
+                <div class="realize"><strong>To realize this effect:</strong> We extract the most high-leverage moments from your raw episodes (syndicator red flags, appraisal tactics) and distribute them across targeted network pages.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">B</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from "forced virality" by tagging and associating your clips with massive industry figures, prompting them to organically engage and share the content to their millions of followers.</p>
+                <div class="realize"><strong>To realize this effect:</strong> Implement a dedicated clipping and tagging strategy designed to trigger algorithm pushes and direct DM reactions from heavyweights.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">C</span>
+              <div class="subpoint-content">
+                <div class="cm-tag">Create Media</div>
+                <p>Utilizes a proven Theme Page architecture as a distribution engine. As shown in our Real Estate Vault case study, our clipping and distribution frameworks consistently generate thousands of views and capture the direct attention of top operators like Pace Morby and Cecilia Reinaldo.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Case study section: below, full width, 3-col grid -->
+          <div class="case-col">
+            <div class="case-caption">Case Study: Theme Page Distribution driving organic attention from Top 1% Operators</div>
+            <div class="case-imgs">
+              <img src="https://cxpluwwplpgzetxhkrgs.supabase.co/functions/v1/serve-private-image?token=L4mEmaQF5K" alt="Pace Morby DM reaction" loading="lazy">
+              <img src="https://cxpluwwplpgzetxhkrgs.supabase.co/functions/v1/serve-private-image?token=s5ZA2te6qz" alt="Pace Morby DM reaction 2" loading="lazy">
+              <img src="https://cxpluwwplpgzetxhkrgs.supabase.co/functions/v1/serve-private-image?token=eV50lCfbgN" alt="Cecilia Reinaldo mention" loading="lazy">
+              <img src="https://cxpluwwplpgzetxhkrgs.supabase.co/functions/v1/serve-private-image?token=h6HJY5Daq1" alt="Real Estate Vault YouTube Shorts" loading="lazy">
+              <img src="https://cxpluwwplpgzetxhkrgs.supabase.co/functions/v1/serve-private-image?token=XySCv6ph4k" alt="Real Estate Vault YouTube Shorts 2" loading="lazy">
+              <img src="https://cxpluwwplpgzetxhkrgs.supabase.co/functions/v1/serve-private-image?token=wn54Heg02p" alt="Vivian Instagram appreciation" loading="lazy">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7: Multi-Channel Distribution ── -->
+    <div class="item" id="item-7">
+      <button class="trigger" onclick="toggle(7)" aria-expanded="false">
+        <span class="num">7</span>
+        <span class="trigger-text">Multi-Channel Distribution</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel" id="panel-7">
+        <div class="panel-inner">
+          <div class="page">
+
+            <div class="subpoint">
+              <span class="sub-letter">A</span>
+              <div class="subpoint-content">
+                <p>Deal Junkies can benefit from multi-channel omnipresence, ensuring that a single 1-hour podcast generates written and visual assets across professional networks like LinkedIn and X (Twitter).</p>
+                <div class="realize"><strong>To realize this effect:</strong> We convert your high-leverage conversations and frameworks into engaging LinkedIn text posts, Twitter threads, and Instagram carousels, capturing the B2B audience and driving them back to the main video episode.</div>
+              </div>
+            </div>
+
+            <div class="subpoint">
+              <span class="sub-letter">B</span>
+              <div class="subpoint-content">
+                <p>The podcast can benefit from capturing and retaining the audience through owned media channels, rather than relying solely on the YouTube algorithm for consistent viewership.</p>
+                <div class="realize"><strong>To realize this effect:</strong> At Create Media we repurpose episode transcripts into value-driven email newsletters and manage your audio RSS feeds (Apple Podcasts / Spotify) with proper SEO metadata, capturing the audience that prefers reading or listening on the go.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /accordion -->
+</div><!-- /doc -->
+
+<script>
+  function toggle(n) {
+    const item  = document.getElementById('item-' + n);
+    const panel = document.getElementById('panel-' + n);
+    const btn   = item.querySelector('.trigger');
+    const isOpen = item.classList.contains('open');
+
+    // Close all open panels first
+    document.querySelectorAll('.item.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.panel').style.maxHeight = null;
+      el.querySelector('.trigger').setAttribute('aria-expanded', 'false');
+    });
+
+    // If this panel was closed, open it
+    if (!isOpen) {
+      item.classList.add('open');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }
+</script>
+</body>
+</html>
